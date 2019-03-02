@@ -8,9 +8,10 @@
    
 + Group tabs from a given set of domains together.
 
-
 + Close audible tabs.
 
+
++ When we group the tabs, don't create a new tab in the new window. Delete it. or suppress creating it.
 
 
 #####

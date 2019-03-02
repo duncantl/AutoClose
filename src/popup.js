@@ -16,24 +16,44 @@ function closeTargetTabs()
 {
     for(var k in TargetTabs) {
 	var tabs = TargetTabs[k];
-	for(var i = 0; i < tabs.length; i++) {
+	for(var i = LeaveOne ? 1 : 0; i < tabs.length; i++) {
 	    chrome.tabs.remove( tabs[i].id);
 	}
 	TargetTabs[k] = null;
     }
 }
 
+
+function groupTargetTabs()
+{
+    chrome.windows.create({}, function(win) {
+	console.log('Created new window ' + win);
+	for(var k in TargetTabs) {
+	    var tabs = TargetTabs[k];
+	    for(var i = 0; i < tabs.length; i++) {
+		chrome.tabs.move( tabs[i].id, {windowId: win.id, index: -1});
+		console.log("moved " + tabs[i].id + " to " + win);
+	    }
+	    TargetTabs[k] = null;
+	}
+    });
+}
+
+
 let utable = document.getElementById('UrlTable');
 
 var TargetTabs = {};
+var LeaveOne = false;
 
-chrome.storage.sync.get('urls', function(data) {
+chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
  //   alert('in setting urls ' + data.urls);
     var i;
     var urls = data.urls;
     console.log(' Got urls ' + urls);
 
     //{populate:true}
+
+    LeaveOne = data.LeaveOne;
 
     chrome.windows.getAll({populate: true},function(windows){
 	windows.forEach(function(window){
@@ -82,3 +102,5 @@ chrome.storage.sync.get('urls', function(data) {
 
 
 document.getElementById('removeTabsButton').addEventListener('click', closeTargetTabs);
+
+document.getElementById('groupTabsButton').addEventListener('click', groupTargetTabs);

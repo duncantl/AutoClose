@@ -1,15 +1,27 @@
 <html>
+<head>
+</head>	
     <body>
 
 	<h3>AutoClose Options Page</h3>
 
- URLs:	<textarea rows="10" id="urls" style="height: 100px"></textarea>
+	<table>
+	    <tr>
+      	    <th>URLs:</th><th><textarea rows="10" cols="100" id="urls" style="height: 100px; width: 70%"></textarea></th></tr>
 
-    <script src="options.js"></script>
+            <tr><th>   Leave one:<input type="checkbox" id="leaveOne"></input></th></tr>
+	</table>
 
+<h3>Patterns</h3>	
+	<table>
+            <tr><th>Regexps:</th><th><textarea rows="10" cols="120" id="urlRegexps" style="height: 100px; width: 70%"></textarea></th></tr>    
+        </table>
 <p>
-   Leave one:<input type="checkbox" name="leaveOne"></input>
 
+
+    <button type="button" id="save">Save</button>
+
+<script src="options.js"></script>    
     </body>
 
     

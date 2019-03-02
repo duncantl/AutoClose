@@ -2,9 +2,8 @@
 
 'use strict';
 
-chrome.runtime.onInstalled.addListener(function() {
-    chrome.storage.sync.set({urls: [
-                                    'chrome://newtab/',
+
+let DefaultURLs = [                 'chrome://newtab/',
 	                            'https://www.nytimes.com/',
 	                            'https://www.washingtonpost.com/',
 				    'https://github.com/',
@@ -12,7 +11,10 @@ chrome.runtime.onInstalled.addListener(function() {
 				    'https://www.irishtimes.com/',
 				    'https://www.bbc.co.uk/sport',
 				    'https://www.youtube.com/'
-]}, function() {
+];
+
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.storage.sync.set({urls: DefaultURLs.join('\n'), 'LeaveOne': false, Regexps: []}, function() {
          console.log('set the URLs for AutoClose.');
     });
 });
