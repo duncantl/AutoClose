@@ -1,13 +1,21 @@
 <html>
     <body>
-	<H2>AutoClose</h2>
-	Tabs to be closed.
+	<H6>AutoClose</h6>
+	<center><h4>Tabs to be processed</h4></center>
+	<center>Pattern: <input type="textfield" id="rx"/></center>
 
 	<table id="UrlTable" align="left">
-	    <tr><th>Keep</th><th>URL</th></tr>
+          <tbody id="urlTBBody">
+	      <tr><th>Keep</th><th>URL</th></tr>
+	  </tbody>	      
 	</table>
 <br/>
-	<button type="button" id="removeTabsButton">Close Tabs</button>	<button type="button" id="groupTabsButton">Groupe Tabs</button>
-	<script src="popup.js"></script>
+
+<center>
+    <button type="button" id="removeTabsButton">Close Tabs</button>
+    <button type="button" id="groupTabsButton">Group Tabs</button>
+</center>
+
+<script src="popup.js"></script>
     </body>	
 </html>    
