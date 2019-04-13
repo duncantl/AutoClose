@@ -260,3 +260,22 @@ function showDups(tabs)
 	    console.log("duplicate for " + k + " " + tabs[k].length);
     }
 }
+
+
+
+function getNumWinTabs()
+{
+    var numWin = 0, numTabs = 0;
+   chrome.windows.getAll({populate: true},
+			  function(windowList) {
+			      windowList.forEach(function(window) {
+				  numWin++;
+				  window.tabs.forEach(function(tab) {
+				      numTabs++;
+				  })
+			      });
+			      console.log([numWin, numTabs]);
+			      return([numWin, numTabs]);
+			  });
+
+}
