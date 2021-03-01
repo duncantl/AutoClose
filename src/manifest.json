@@ -8,7 +8,7 @@
 
 //	"default_locale": "en",
 
-        "options_page": "options.html",
+//        "options_page": "options.html",
         "options_ui": { "page": "options.html",
 	 	        "browser_style": true
 		      },
@@ -37,7 +37,7 @@
 
        "browser_specific_settings": {
 	   "gecko": {
-	       "id": "dtemplelang@ucdavis.edu"
+	       "id": "autoclose@github.com"
 	   }
        }
        
