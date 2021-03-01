@@ -45,16 +45,23 @@ function closeTargetTabs(tabs = TargetTabs, leaveOne = LeaveOne)
 function groupTargetTabs()
 {
     chrome.windows.create({}, function(win) {
-	console.log('Created new window ' + win);
+	console.log('Created new window ' + win + " " + win.type);
 	//XXX remove the first tab that was created automatically for this new window.
+	var ctr = -1;
+	var tids = [];
+	
 	for(var k in TargetTabs) {
 	    var tabs = TargetTabs[k];
 	    for(var i = 0; i < tabs.length; i++) {
-		chrome.tabs.move( tabs[i].id, {windowId: win.id, index: -1});
-		console.log("moved " + tabs[i].id + " to " + win);
+		//chrome.tabs.move( [ tabs[i].id ], {windowId: win.id, index: 0});
+		tids.push(tabs[i].id);
+		console.log("moving " + tabs[i].id + " " + tabs[i].url + " to " + win.id);
 	    }
 	    TargetTabs[k] = null;
 	}
+	// works sometimes
+	chrome.tabs.move( tids, {windowId: win.id, index: 0});// .then(function(tab) { console.log("moved " + tab.id);},
+							      //       function(err) { console.log("error moving " + err);}) 
     });
 }
 
@@ -69,7 +76,7 @@ let TargetTabs = {};
 let LeaveOne = false;
 
 chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
-   alert('in setting urls ' + data.urls);
+  // alert('in setting urls ' + data);
     var i;
     var urls = data.urls.split('\n');
     console.log(' Got urls ' + urls.join(', '));
@@ -79,8 +86,8 @@ chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
 
     LeaveOne = data.LeaveOne;
 
-    chrome.windows.getAll({populate: true},function(windows){
-	windows.forEach(function(window){
+    chrome.windows.getAll({populate: true}, function(windows){
+	windows.forEach( function(window){
 	    window.tabs.forEach(function(tab){
 		//		console.log(tab.url);
 		if(inURLs(tab.url, urls, rx)) {
@@ -93,7 +100,7 @@ chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
 //	console.log(" got tabs");
 //    });
     
-
+/*
     for(i = 0; i < data.urls.length; i++) {
 	var u = data.urls[i];
 	console.log("processing " + u);
@@ -110,7 +117,7 @@ chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
 	
 	utable.appendChild(tr);
     }
-
+*/
 });
 
 
@@ -143,20 +150,6 @@ function processRX(rx, exact)
     chrome.windows.getAll({populate: true},function(windows){
 	windows.forEach(function(window){
 	    window.tabs.forEach(function(tab){
-/*		
-		if(exact) {
-		    console.log("match by exact");
-		    if(tab.url == rx) {
-			addURLTabToTable(tab.url, tab);
-		    }
-    	        } else {
-		    console.log("match by regex");
-		    if(tab.url.match(rx)) {
-			addURLTabToTable(tab.url, tab);
-		    }
-		}
-*/
-		
 		match = exact ? (tab.url == rx) : tab.url.match(rx); 
 		console.log(tab.url + ' ' +  match);
 		if(match) {
