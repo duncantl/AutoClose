@@ -6,7 +6,9 @@
 	<H6><a href="README.md">AutoClose</a></h6>
 
 	<center>
-            <button type="button" id="mute">Mute All</button>	    	    
+        <button type="button" id="mute">Mute All</button>
+
+        <button type="button" id="closeNewTabs">Close empty new tabs</button>	    	    	
 	</center>
 	<hr width="75%"/>
 	
@@ -20,7 +22,9 @@
           <button type="button" id="duplicates">De-duplicate</button>
 	</center>
 
-	<hr width="75%"/>
+	<br/>
+	
+<hr width="75%"/>
 	
 	<table id="UrlTable" align="left">
           <tbody id="urlTBBody">
@@ -39,6 +43,21 @@
 <center>
     <input type="checkbox" id="leaveOne">Leave One per URL group</input>
 </center>    
+
+
+<br/>
+
+<hr width="75%"/>
+<h4>Find Tab</h4>
+
+URL pattern: <input type="textfield" id="rx"/>
+<label for="tabURL">Common URLs</label>
+<select name="tabURL" id="tabURL">
+<option value="https://mail.google.com">GMail</option>
+<option value="https://www.nytimes.com">NYT</option>
+<option value="https://www.washpost.com">Washington Post</option>
+</select>
+
 
 <script src="popup.js"></script>
     </body>	

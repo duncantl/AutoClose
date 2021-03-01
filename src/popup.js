@@ -136,6 +136,13 @@ document.getElementById('rx').addEventListener('keydown', function(event)  {
 									  document.getElementById('exactMatch').checked);
                                                             });
 
+
+document.getElementById('tabURL').addEventListener('change', function(ev) { jumpToTabByURL(ev.target.value, false); } );
+
+document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
+
+
+
 function processRX(rx, exact)
 {
 //    console.log('processRX ' + rx + ' ' + exact + ' ' + (typeof exact) );
@@ -293,4 +300,82 @@ function getNumWinTabs()
 			      console.log([numWin, numTabs]);
 			      return([numWin, numTabs]);
 			  });
+}
+
+
+
+function jumpToTabByURL(url, exact)
+{
+ //  console.log("looking for " + url + " " + exact);
+   chrome.windows.getAll({populate: true},
+			  function(windowList) {
+			      windowList.forEach(function(window) {
+				  window.tabs.forEach(function(tab) {
+				      console.log(tab + " " +  tab.url);
+				      var ok = exact ? tab.url == url : tab.url.match(url) !== null;
+				      if(!ok) 
+					  ok = exact ? tab.title == url : tab.title.match(url) !== null;
+
+				      if(ok) {
+					  console.log("found tab for " + url + " " + tab);
+					  browser.tabs.update(tab.id, {active: true});
+
+
+					  // if the tab is not in the current window, bring that window to the front.
+					  if(!window.active)
+					      chrome.windows.update(window.id, {focused: true});
+				      }
+				      
+				  })
+			      })
+			  });
+}
+
+
+
+function closeAllNewTabs()
+{
+    closeAllMatchingTabs( (t) => { return t.url == 'about:newtab' });
+}
+
+function closeAllMatchingTabs(matchFun)
+{
+    var ids = [];
+    var tmp = browser.windows.getAll({ populate: true });
+    tmp.then( (windows) => {
+
+	windows.forEach(function(window) {
+	    window.tabs.forEach(function(tab) {
+		if(matchFun(tab)) {
+		    console.log("discarding new tab " + tab.id);
+		    ids.push(tab.id);
+//		    browser.tabs.discard([ tab.id] );
+		}
+	    })
+	});
+
+	console.log("ids = " + ids);
+	var h = browser.tabs.remove( ids );
+	h.then( () => { console.log("discarded"); }, (err) => {console.log("error discarding " + err);});
+    });
+
+/*	
+			  function(windowList) {
+			      windowList.forEach(function(window) {
+				  window.tabs.forEach(function(tab) {
+				      if(matchFun(tab)) {
+					  console.log("discarding new tab " + tab.id);
+					  ids.push(tab.id);
+				      }
+				  })
+			      })
+			  });
+
+    tmp.then(
+			      () => { if(ids.size > 0) {
+				        console.log("discarding " + ids.size +  " tabs");
+				        browser.tabs.discard( ids );
+			      } },
+        function(err) { console.log("error in closing tabs: " + err);} );
+*/
 }
