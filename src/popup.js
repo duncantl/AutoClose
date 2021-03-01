@@ -69,7 +69,7 @@ let TargetTabs = {};
 let LeaveOne = false;
 
 chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
- //   alert('in setting urls ' + data.urls);
+   alert('in setting urls ' + data.urls);
     var i;
     var urls = data.urls.split('\n');
     console.log(' Got urls ' + urls.join(', '));
@@ -93,7 +93,7 @@ chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
 //	console.log(" got tabs");
 //    });
     
- /*
+
     for(i = 0; i < data.urls.length; i++) {
 	var u = data.urls[i];
 	console.log("processing " + u);
@@ -110,7 +110,7 @@ chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
 	
 	utable.appendChild(tr);
     }
-*/
+
 });
 
 
@@ -125,23 +125,44 @@ document.getElementById('duplicates').addEventListener('click', removeDuplicates
 // arrange for a return (\n) to trigger processRX().
 document.getElementById('rx').addEventListener('keydown', function(event)  {
                                                             if(event.keyCode == 13)
-							        processRX(event.target.value);
+							        processRX(event.target.value,
+									  document.getElementById('exactMatch').checked);
                                                             });
 
-function processRX(rx)
+function processRX(rx, exact)
 {
-    //    alert('processRX ' + rx);
+//    console.log('processRX ' + rx + ' ' + exact + ' ' + (typeof exact) );
+
+    
     // consolidate with above into a parameterizable function
     var utable = clearTable();
     TargetTabs = {};
+
+    var match = false;
     
     chrome.windows.getAll({populate: true},function(windows){
 	windows.forEach(function(window){
 	    window.tabs.forEach(function(tab){
-		//		console.log(tab.url);
-		if(tab.url.match(rx)) {
+/*		
+		if(exact) {
+		    console.log("match by exact");
+		    if(tab.url == rx) {
+			addURLTabToTable(tab.url, tab);
+		    }
+    	        } else {
+		    console.log("match by regex");
+		    if(tab.url.match(rx)) {
+			addURLTabToTable(tab.url, tab);
+		    }
+		}
+*/
+		
+		match = exact ? (tab.url == rx) : tab.url.match(rx); 
+		console.log(tab.url + ' ' +  match);
+		if(match) {
 		    addURLTabToTable(tab.url, tab);
 		}
+
 	    });
 	});
     });    
@@ -215,6 +236,9 @@ function showTab(tab)
 }
 
 
+/*
+  Mute all tabs that are audible.  Does not use the regular expression.
+*/
 function muteTabs()
 {
 // adapted from https://github.com/danhp/mute-tab-chrome/blob/master/src/background.js
@@ -262,12 +286,11 @@ function showDups(tabs)
 }
 
 
-
 function getNumWinTabs()
 {
     var numWin = 0, numTabs = 0;
-   chrome.windows.getAll({populate: true},
-			  function(windowList) {
+    chrome.windows.getAll({populate: true},
+  			  function(windowList) {
 			      windowList.forEach(function(window) {
 				  numWin++;
 				  window.tabs.forEach(function(tab) {
@@ -277,5 +300,4 @@ function getNumWinTabs()
 			      console.log([numWin, numTabs]);
 			      return([numWin, numTabs]);
 			  });
-
 }

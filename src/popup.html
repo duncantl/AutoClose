@@ -1,22 +1,39 @@
 <html>
     <body>
-	<H6><a href="../README.md">AutoClose</a></h6>
+	<H6><a href="README.md">AutoClose</a></h6>
+
+	<center>
+            <button type="button" id="mute">Mute All</button>	    
+	</center>
+
+	<hr width="75%"/>	
+	
 	<center><h4>Tabs to be processed</h4></center>
-	<center>Pattern: <input type="textfield" id="rx"/>  <button type="button" id="mute">Mute</button>
+	<center>Pattern: <input type="textfield" id="rx"/>
+	    <input type="checkbox" name="exactMatch" id="exactMatch" value="false">Literal match</input>
+	</center>
+	<br>
+	<center>
           <button type="button" id="duplicates">De-duplicate</button>
 	</center>
 
+<hr width="75%"/>	
 	<table id="UrlTable" align="left">
           <tbody id="urlTBBody">
 	      <tr><th>Keep</th><th>URL</th></tr>
 	  </tbody>	      
 	</table>
-<br/>
+	<br/>
 
 <center>
     <button type="button" id="removeTabsButton">Close Tabs</button>
     <button type="button" id="groupTabsButton">Group Tabs</button>
 </center>
+
+
+<center>
+    <input type="radio" id="leaveOne">Leave One per URL group</input>
+</center>    
 
 <script src="popup.js"></script>
     </body>	
