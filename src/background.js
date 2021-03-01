@@ -3,7 +3,7 @@
 'use strict';
 
 
-let DefaultURLs = [                 'chrome://newtab/',
+let DefaultURLs = [                 'about:newtab',   //   for google chrome, the URL of a new empty tab is chrome://newtab/'
 	                            'https://mail.google.com/mail',				    
 	                            'https://www.nytimes.com/',
 	                            'https://www.washingtonpost.com/',
@@ -12,14 +12,14 @@ let DefaultURLs = [                 'chrome://newtab/',
 				    'https://www.irishtimes.com/',
 				    'https://www.bbc.co.uk/sport',
 				    'https://www.youtube.com/',
-				    'https://www.kqed.org/radio/live'
+				    'https://www.kqed.org/radio/live',
+				    "https://oasis.ucdavis.edu",
+				    "https://gradhub.ucdavis.edu"
 ];
 
 let DefaultRX = ["https?://dsi.ucdavis.edu/.*",
 		 "https://netflix.com/",
-		 "https://amazon.com/Prime-Video"		 ,
-		 "https://oasis.ucdavis.edu",
-		 "https://gradhub.ucdavis.edu",		 
+		 "https://amazon.com/Prime-Video"		
      	        ];
 
 chrome.runtime.onInstalled.addListener(function() {
