@@ -4,6 +4,7 @@
 
 
 let DefaultURLs = [                 'chrome://newtab/',
+	                            'https://mail.google.com/mail',				    
 	                            'https://www.nytimes.com/',
 	                            'https://www.washingtonpost.com/',
 				    'https://github.com/',
@@ -15,7 +16,10 @@ let DefaultURLs = [                 'chrome://newtab/',
 ];
 
 let DefaultRX = ["https?://dsi.ucdavis.edu/.*",
-		 "https://netflix.com/"
+		 "https://netflix.com/",
+		 "https://amazon.com/Prime-Video"		 ,
+		 "https://oasis.ucdavis.edu",
+		 "https://gradhub.ucdavis.edu",		 
      	        ];
 
 chrome.runtime.onInstalled.addListener(function() {
