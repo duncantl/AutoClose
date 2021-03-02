@@ -424,7 +424,7 @@ document.getElementById('tabURL').addEventListener('change', function(ev) { jump
 
 document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
 
-document.getElementById('moveMoz').addEventListener('click', function(ev) { moveMatchingTabsToNewWindow('https://developer.mozilla.org/') });
+// document.getElementById('moveMoz').addEventListener('click', function(ev) { moveMatchingTabsToNewWindow('https://developer.mozilla.org/') });
 
 
 document.getElementById('findTabRX').addEventListener('keydown', function(event)  {
@@ -437,5 +437,12 @@ document.getElementById('findTabRX').addEventListener('keydown', function(event)
 document.getElementById('groupRX').addEventListener('keydown', function(event)  {
                                                             if(event.keyCode == 13) 
 							        moveMatchingTabsToNewWindow(event.target.value);
-                                                            });
+});
+
+document.getElementById('closeTabsRX').addEventListener('keydown', function(event)  {
+    if(event.keyCode == 13) {
+	var rx = event.target.value;
+	closeAllMatchingTabs( (t) => { return t.url.match(rx) } ) ;
+    }
+});
 
