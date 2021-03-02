@@ -298,13 +298,14 @@ function showTab2(tab, window)
 
 function jumpToTabByURL(url, exact)
 {
-    //  console.log("looking for " + url + " " + exact);
+    console.log("looking for " + url + " " + exact);
     var found = false;
-   var p = chrome.windows.getAll({populate: true},
+    var pr = browser.windows.getAll({populate: true});
+    pr.then(
 			  function(windowList) {
 			      windowList.forEach(function(window) {
 				  window.tabs.forEach(function(tab) {
-//				      console.log(tab + " " +  tab.url);
+				      console.log(tab + " " +  tab.url);
 				      var ok = exact ? tab.url == url : tab.url.match(url) !== null;
 				      if(!ok) 
 					  ok = exact ? tab.title == url : tab.title.match(url) !== null;
@@ -319,14 +320,17 @@ function jumpToTabByURL(url, exact)
 				      
 				  })
 			      })
-			  });
+			      if(!found)
+				  browser.tabs.create({ url: url}) ;
+			  },
+        err => console.log("error: "+ err));
 
 
     // p.then( () => { if(!done) browser.tabs.create({ url: url}) },  err => console.log("error: " + error));
-    if(found == false) {
-	console.log("didn't find tab so creating one");
-	browser.tabs.create({ url: url}) ;
-    }
+//    if(found == false) {
+//	console.log("didn't find tab so creating one");
+//	browser.tabs.create({ url: url}) ;
+//    }
 }
 
 
