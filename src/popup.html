@@ -1,16 +1,63 @@
 <html>
     <head>
 	<meta charset="UTF-8">
+	<link rel="stylesheet" href="popup.css"></link>
     </head>	
     <body>
-	<H6><a href="README.md">AutoClose</a></h6>
+	<H6><a href="README.html">AutoClose</a></h6>
 
+	<div>
+<h4>Global Actions</h4>	    
 	<center>
         <button type="button" id="mute">Mute All</button>
 
         <button type="button" id="closeNewTabs">Close empty new tabs</button>	    	    	
+
+        <button type="button" id="duplicates">De-duplicate</button>	
+
 	</center>
+</div>	
+
+<br/>
+
+<hr width="75%"/>
+<div>
+<h4>Find Tab</h4>
+
+URL pattern: <input type="textfield" id="findTabRX"/>
+<label for="tabURL">Common URLs</label>
+<select name="tabURL" id="tabURL">
+<option value="https://mail.google.com">GMail</option>
+<option value="https://calendar.google.com/calendar/u/0/r/week">GCalendar</option>
+<option value="https://www.nytimes.com">NYT</option>
+<option value="https://www.washpost.com">Washington Post</option>
+<option value="https://www.irishtimes.com">Irish Times</option>
+<option value="https://www.youtube.com">Youtube</option>
+<option value="https://www.bbc.co.uk/sport">BBC sport</option>
+<option value="https://github.com">Github</option>
+<option value="https://oasis.ucdavis.edu">OASIS</option>
+<option value="https://grad.ucdavis.edu/programs">Grad programs</option>
+</select>
+
+
+	<br/>
+
+<hr width="75%"/>
+<div>
+<h4>Group Tabs</h4>
+
+Pattern: <input type="textfield" id="groupRX" />
+
+
+<!-- remove -->
+	<button type="button" id="moveMoz">Mozilla new window</button>
+
+</div>
+
+
+<br/>
 	<hr width="75%"/>
+
 	
 	<center><h4>Tabs to be processed</h4></center>
 	<center>Pattern: <input type="textfield" id="rx"/>
@@ -19,11 +66,9 @@
 	<br>
 
 	<center>
-          <button type="button" id="duplicates">De-duplicate</button>
 	</center>
 
-	<br/>
-	
+
 <hr width="75%"/>
 	
 	<table id="UrlTable" align="left">
@@ -45,18 +90,6 @@
 </center>    
 
 
-<br/>
-
-<hr width="75%"/>
-<h4>Find Tab</h4>
-
-URL pattern: <input type="textfield" id="rx"/>
-<label for="tabURL">Common URLs</label>
-<select name="tabURL" id="tabURL">
-<option value="https://mail.google.com">GMail</option>
-<option value="https://www.nytimes.com">NYT</option>
-<option value="https://www.washpost.com">Washington Post</option>
-</select>
 
 
 <script src="popup.js"></script>

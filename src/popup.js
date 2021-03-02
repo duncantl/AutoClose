@@ -120,29 +120,6 @@ chrome.storage.sync.get(['urls', 'LeaveOne', 'Regexps'], function(data) {
 });
 
 
-document.getElementById('removeTabsButton').addEventListener('click', function() { TargetTabs = closeTargetTabs(TargetTabs, LeaveOne)});
-
-document.getElementById('groupTabsButton').addEventListener('click', groupTargetTabs);
-
-document.getElementById('mute').addEventListener('click', muteTabs);
-
-document.getElementById('duplicates').addEventListener('click', removeDuplicates);
-
-// arrange for a return (\n) to trigger processRX().
-document.getElementById('rx').addEventListener('keydown', function(event)  {
-                                                            if(event.keyCode == 13)
-							        processRX(event.target.value,
-									  document.getElementById('exactMatch').checked);
-                                                            });
-
-
-document.getElementById('tabURL').addEventListener('change', function(ev) { jumpToTabByURL(ev.target.value, false); } );
-
-document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
-
-document.getElementById('moveMoz').addEventListener('click', function(ev) { moveMatchingTabsToNewWindow('https://developer.mozilla.org/') });
-
-
 
 function processRX(rx, exact)
 {
@@ -321,8 +298,9 @@ function showTab2(tab, window)
 
 function jumpToTabByURL(url, exact)
 {
- //  console.log("looking for " + url + " " + exact);
-   chrome.windows.getAll({populate: true},
+    //  console.log("looking for " + url + " " + exact);
+    var found = false;
+   var p = chrome.windows.getAll({populate: true},
 			  function(windowList) {
 			      windowList.forEach(function(window) {
 				  window.tabs.forEach(function(tab) {
@@ -334,11 +312,21 @@ function jumpToTabByURL(url, exact)
 				      if(ok) {
 					  // console.log("found tab for " + url + " " + tab);
 					  showTab2(tab, window);
+					  found = true;
+					  console.log("found tab " + tab.url);
+					  // Can stop the looping here but how - throw an error, return false/true ?
 				      }
 				      
 				  })
 			      })
 			  });
+
+
+    // p.then( () => { if(!done) browser.tabs.create({ url: url}) },  err => console.log("error: " + error));
+    if(found == false) {
+	console.log("didn't find tab so creating one");
+	browser.tabs.create({ url: url}) ;
+    }
 }
 
 
@@ -406,3 +394,44 @@ function moveMatchingTabsToNewWindow(rx)
 				     }
 				    );
 }
+
+
+
+
+
+
+document.getElementById('removeTabsButton').addEventListener('click', function() { TargetTabs = closeTargetTabs(TargetTabs, LeaveOne)});
+
+document.getElementById('groupTabsButton').addEventListener('click', groupTargetTabs);
+
+document.getElementById('mute').addEventListener('click', muteTabs);
+
+document.getElementById('duplicates').addEventListener('click', removeDuplicates);
+
+// arrange for a return (\n) to trigger processRX().
+document.getElementById('rx').addEventListener('keydown', function(event)  {
+                                                            if(event.keyCode == 13)
+							        processRX(event.target.value,
+									  document.getElementById('exactMatch').checked);
+                                                            });
+
+
+document.getElementById('tabURL').addEventListener('change', function(ev) { jumpToTabByURL(ev.target.value, false); } );
+
+document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
+
+document.getElementById('moveMoz').addEventListener('click', function(ev) { moveMatchingTabsToNewWindow('https://developer.mozilla.org/') });
+
+
+document.getElementById('findTabRX').addEventListener('keydown', function(event)  {
+                                                            if(event.keyCode == 13)
+							        jumpToTabByURL(event.target.value, false);
+                                                            });
+
+
+
+document.getElementById('groupRX').addEventListener('keydown', function(event)  {
+                                                            if(event.keyCode == 13) 
+							        moveMatchingTabsToNewWindow(event.target.value);
+                                                            });
+
