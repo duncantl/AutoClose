@@ -1,5 +1,4 @@
-
-// use strict;
+// use strict
 
 
 // determine whether u is an element of urls or matches one of the rx elements.
@@ -141,6 +140,8 @@ document.getElementById('tabURL').addEventListener('change', function(ev) { jump
 
 document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
 
+document.getElementById('moveMoz').addEventListener('click', function(ev) { moveMatchingTabsToNewWindow('https://developer.mozilla.org/') });
+
 
 
 function processRX(rx, exact)
@@ -214,8 +215,9 @@ function addURLTabToTable(url, tab)
     th.setAttribute('align', 'left');
     var a = document.createElement("a");
     a.innerHTML = url;
-    a.setAttribute('href', url);
-    a.addEventListener('click', function() { showTab(tab); });
+    a.setAttribute('class', "TabLink");
+//    a.setAttribute('href', url);
+    a.addEventListener('click', function() { showTab2(tab); });
     th.appendChild(a);
     tr.appendChild(th);
     utable.appendChild(tr);
@@ -228,6 +230,7 @@ function addURLTabToTable(url, tab)
     return(url);
 }
 
+// see showTab2() below.
 function showTab(tab)
 {
     console.log("Showing tab " + tab.url + " " + tab.id);
@@ -303,6 +306,18 @@ function getNumWinTabs()
 }
 
 
+function showTab2(tab, window)
+{
+    browser.tabs.update(tab.id, {active: true});
+
+    console.log("showTab2: " + tab.windowId);
+
+					  // if the tab is not in the current window, bring that window to the front.
+    if(window && !window.active)
+	chrome.windows.update(window.id, {focused: true});
+    else
+	chrome.windows.update(tab.windowId, {focused: true});
+}
 
 function jumpToTabByURL(url, exact)
 {
@@ -311,26 +326,20 @@ function jumpToTabByURL(url, exact)
 			  function(windowList) {
 			      windowList.forEach(function(window) {
 				  window.tabs.forEach(function(tab) {
-				      console.log(tab + " " +  tab.url);
+//				      console.log(tab + " " +  tab.url);
 				      var ok = exact ? tab.url == url : tab.url.match(url) !== null;
 				      if(!ok) 
 					  ok = exact ? tab.title == url : tab.title.match(url) !== null;
 
 				      if(ok) {
-					  console.log("found tab for " + url + " " + tab);
-					  browser.tabs.update(tab.id, {active: true});
-
-
-					  // if the tab is not in the current window, bring that window to the front.
-					  if(!window.active)
-					      chrome.windows.update(window.id, {focused: true});
+					  // console.log("found tab for " + url + " " + tab);
+					  showTab2(tab, window);
 				      }
 				      
 				  })
 			      })
 			  });
 }
-
 
 
 function closeAllNewTabs()
@@ -347,9 +356,7 @@ function closeAllMatchingTabs(matchFun)
 	windows.forEach(function(window) {
 	    window.tabs.forEach(function(tab) {
 		if(matchFun(tab)) {
-		    console.log("discarding new tab " + tab.id);
 		    ids.push(tab.id);
-//		    browser.tabs.discard([ tab.id] );
 		}
 	    })
 	});
@@ -358,24 +365,44 @@ function closeAllMatchingTabs(matchFun)
 	var h = browser.tabs.remove( ids );
 	h.then( () => { console.log("discarded"); }, (err) => {console.log("error discarding " + err);});
     });
+}
 
-/*	
-			  function(windowList) {
-			      windowList.forEach(function(window) {
-				  window.tabs.forEach(function(tab) {
-				      if(matchFun(tab)) {
-					  console.log("discarding new tab " + tab.id);
-					  ids.push(tab.id);
-				      }
-				  })
-			      })
-			  });
 
-    tmp.then(
-			      () => { if(ids.size > 0) {
-				        console.log("discarding " + ids.size +  " tabs");
-				        browser.tabs.discard( ids );
-			      } },
-        function(err) { console.log("error in closing tabs: " + err);} );
-*/
+
+function processAllMatchingTabs(matchFun, procTabIds)
+{
+    console.log("in processAllMatchingTabs" + matchFun + " " + procTabIds);
+    var ids = [];
+    var tmp = browser.windows.getAll({ populate: true });
+    console.log("about to do the then() part");
+    tmp.then( (windows) => {
+
+	console.log("In the then() function " + windows);
+	windows.forEach(function(window) {
+	    console.log("processing window " + window.id + " " + window.title);
+	    window.tabs.forEach(function(tab) {
+//		console.log("matching tab " + tab.url);
+		if(matchFun(tab)) {
+		    console.log("matched tab " + tab.id);
+		    ids.push(tab.id);
+		}
+	    })
+	},  err => console.log("then() error: " + err ));
+
+	console.log("ids = " + ids);
+	var h = procTabIds(ids);
+	h.then( () => { console.log("done"); }, (err) => {console.log("error processing " + err);});
+    },  err => console.log("error in processAllMatchingTabs when getting the windows: " + err));
+}
+
+function moveMatchingTabsToNewWindow(rx)
+{
+    console.log("moveMatchingTabsToNewWindow " + rx);
+    var win = browser.windows.create({}, // {titlePreface: "Hi there"},
+				     function(win) {
+					 console.log("calling processAllMatchingTabs");
+					 processAllMatchingTabs((t) => { return t.url.match(rx) },
+							        (tabIds) => { console.log("Moving tabs to window "); return browser.tabs.move(tabIds, {windowId: win.id, index: -1} );  })
+				     }
+				    );
 }
