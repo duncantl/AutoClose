@@ -339,7 +339,7 @@ function closeAllNewTabs()
     closeAllMatchingTabs( (t) => { return t.url == 'about:newtab' });
 }
 
-function closeAllMatchingTabs(matchFun)
+function closeAllMatchingTabs(matchFun, currentWindowOnly)
 {
     var ids = [];
     var tmp = browser.windows.getAll({ populate: true });
@@ -360,17 +360,37 @@ function closeAllMatchingTabs(matchFun)
 }
 
 
+function getCurrentWindowID()
+{
+    var wid = -1;
+    console.log("getting current window id = " + browser.windows.getCurrent({}).id);
+    var pr = browser.windows.getCurrent({});
+    pr.then( (w) =>  { console.log("setting wid to " + w.id);  wid = w.id }, (err) => { console.log("getCurrent() error:" + err) });
+    return(wid);
+}
 
-function processAllMatchingTabs(matchFun, procTabIds)
+async function processAllMatchingTabs(matchFun, procTabIds, currentWindowOnly)
 {
     console.log("in processAllMatchingTabs" + matchFun + " " + procTabIds);
     var ids = [];
-    var tmp = browser.windows.getAll({ populate: true });
-    console.log("about to do the then() part");
+    var wid = -1;
+    if(currentWindowOnly)  {
+	// wid = await getCurrentWindowID()
+	var pr = browser.windows.getCurrent({});
+	pr.then( (w) =>  { console.log("setting wid to " + w.id);  wid = w.id }, (err) => { console.log("getCurrent() error:" + err) });
+    }
+
+
+    var tmp = browser.windows.getAll({ populate: true });    
+    console.log("about to do the then() part.  " + currentWindowOnly + " wid = " + wid);
     tmp.then( (windows) => {
+
 
 	console.log("In the then() function " + windows);
 	windows.forEach(function(window) {
+	    if(wid > -1 && window.id != wid)
+		return(false);
+	    
 	    console.log("processing window " + window.id + " " + window.title);
 	    window.tabs.forEach(function(tab) {
 //		console.log("matching tab " + tab.url);
@@ -387,14 +407,15 @@ function processAllMatchingTabs(matchFun, procTabIds)
     },  err => console.log("error in processAllMatchingTabs when getting the windows: " + err));
 }
 
-function moveMatchingTabsToNewWindow(rx)
+function moveMatchingTabsToNewWindow(rx, currentWindowOnly)
 {
     console.log("moveMatchingTabsToNewWindow " + rx);
     var win = browser.windows.create({}, // {titlePreface: "Hi there"},
 				     function(win) {
 					 console.log("calling processAllMatchingTabs");
 					 processAllMatchingTabs((t) => { return t.url.match(rx) },
-							        (tabIds) => { console.log("Moving tabs to window "); return browser.tabs.move(tabIds, {windowId: win.id, index: -1} );  })
+							        (tabIds) => { console.log("Moving tabs to window "); return browser.tabs.move(tabIds, {windowId: win.id, index: -1} );  },
+							        currentWindowOnly);
 				     }
 				    );
 }
@@ -436,13 +457,18 @@ document.getElementById('findTabRX').addEventListener('keydown', function(event)
 
 document.getElementById('groupRX').addEventListener('keydown', function(event)  {
                                                             if(event.keyCode == 13) 
-							        moveMatchingTabsToNewWindow(event.target.value);
+							        moveMatchingTabsToNewWindow(event.target.value, localToWindow());
 });
 
 document.getElementById('closeTabsRX').addEventListener('keydown', function(event)  {
     if(event.keyCode == 13) {
 	var rx = event.target.value;
-	closeAllMatchingTabs( (t) => { return t.url.match(rx) } ) ;
+	processAllMatchingTabs( (t) => { return t.url.match(rx) }, ids => browser.tabs.remove(ids), localToWindow() ) ;
     }
 });
 
+
+function localToWindow()
+{
+    return( document.getElementById('localToWindow').checked );
+}
