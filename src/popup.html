@@ -10,7 +10,7 @@
 <h4>Global Actions</h4>	    
 	<center>
         <button type="button" id="mute">Mute All</button>
-
+	
         <button type="button" id="closeNewTabs">Close empty new tabs</button>	    	    	
 
         <button type="button" id="duplicates">De-duplicate</button>	
@@ -52,8 +52,23 @@ Pattern: <input type="textfield" id="groupRX" />
 
 <h4>Close Tabs</h4>
 
-Pattern: <input type="textfield" id="closeTabsRX" />
+<p>
+	Close all tabs for
+	<select id="closeCommonTabs">
+	    <option value="ucdavis.zoom.us">Zoom</option>
+	    <option value="nytimes.com">NYyimes</option>
+	    <option value="washingtonpost.com">WashPost</option>
+	    <option value="stats.gradhub.ucdavis.edu">gradhub</option>	    
+	    <option value="oasis.ucdavis.edu">OASIS</option>
+	    <option value="youtube.com">YouTube</option>
+	    <option value="docs.google.com">Google Drive</option>
+	    <option value="about:newtab">Empty new tabs</option>
+	    <option value="ucdavis.app.box.com">Box (ucdavis)</option>
+	    <option value="llvm.org/doxygen">LLVM API pages</option>
+	</select>
 
+Pattern: <input type="textfield" id="closeTabsRX" />
+</p>
 
 </div>
 

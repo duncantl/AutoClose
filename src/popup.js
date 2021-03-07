@@ -339,6 +339,7 @@ function closeAllNewTabs()
     closeAllMatchingTabs( (t) => { return t.url == 'about:newtab' });
 }
 
+// this should just call processAllMatchingTabs
 function closeAllMatchingTabs(matchFun, currentWindowOnly)
 {
     var ids = [];
@@ -442,6 +443,8 @@ document.getElementById('rx').addEventListener('keydown', function(event)  {
 
 
 document.getElementById('tabURL').addEventListener('change', function(ev) { jumpToTabByURL(ev.target.value, false); } );
+
+document.getElementById('closeCommonTabs').addEventListener('change', function(ev) { closeAllMatchingTabs( t => t.url.match(ev.target.value), localToWindow()); } );
 
 document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
 
