@@ -348,6 +348,7 @@ function closeAllMatchingTabs(matchFun, currentWindowOnly)
 
 	windows.forEach(function(window) {
 	    window.tabs.forEach(function(tab) {
+		console.log(" checking " + tab.url);
 		if(matchFun(tab)) {
 		    ids.push(tab.id);
 		}
@@ -444,8 +445,17 @@ document.getElementById('rx').addEventListener('keydown', function(event)  {
 
 document.getElementById('tabURL').addEventListener('change', function(ev) { jumpToTabByURL(ev.target.value, false); } );
 
-document.getElementById('closeCommonTabs').addEventListener('change', function(ev) { closeAllMatchingTabs( t => t.url.match(ev.target.value), localToWindow()); } );
-
+document.getElementById('closeCommonTabs').addEventListener('change',
+							    function(ev) {
+								   
+								console.log( "looking for " + ev.target.value + " " + closeLiteralOrPattern());
+								closeAllMatchingTabs(
+								    closeLiteralOrPattern() ?
+									t => (t.url.match( (ev.target.value + "/?$")))
+									:
+								         t => t.url.match(ev.target.value),
+								    localToWindow()); } );
+     
 document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTabs);
 
 // document.getElementById('moveMoz').addEventListener('click', function(ev) { moveMatchingTabsToNewWindow('https://developer.mozilla.org/') });
@@ -453,7 +463,7 @@ document.getElementById('closeNewTabs').addEventListener('click', closeAllNewTab
 
 document.getElementById('findTabRX').addEventListener('keydown', function(event)  {
                                                             if(event.keyCode == 13)
-							        jumpToTabByURL(event.target.value, false);
+							        jumpToTabByURL(event.target.value, false); // doesn't apply only to current window.
                                                             });
 
 
@@ -475,3 +485,10 @@ function localToWindow()
 {
     return( document.getElementById('localToWindow').checked );
 }
+
+function closeLiteralOrPattern()
+{
+    return( document.getElementById('closePatternOrLiteral').checked );
+}
+
+
