@@ -7,7 +7,7 @@ function inURLs(u, urls, rx) {
     var i = 0;
     for(i = 0; i < urls.length; i++) {
 	if(urls[i] == u) {
-	    console.log("found " + u);
+	    console.log("[inURLs] found " + u);
 	    return true;
 	}
     }
@@ -409,21 +409,41 @@ async function processAllMatchingTabs(matchFun, procTabIds, currentWindowOnly)
     },  err => console.log("error in processAllMatchingTabs when getting the windows: " + err));
 }
 
+function xyz(win) {
+    console.log(`msg: ${win}`);
+}
+
 function moveMatchingTabsToNewWindow(rx, currentWindowOnly)
 {
-    console.log("moveMatchingTabsToNewWindow " + rx);
-    var win = browser.windows.create({}, // {titlePreface: "Hi there"},
-				     function(win) {
-					 console.log("calling processAllMatchingTabs");
-					 processAllMatchingTabs((t) => { return t.url.match(rx) },
-							        (tabIds) => { console.log("Moving tabs to window "); return browser.tabs.move(tabIds, {windowId: win.id, index: -1} );  },
-							        currentWindowOnly);
-				     }
-				    );
+    console.log("moveMatchingTabsToNewWindow: pattern " + rx);
+    var win = browser.windows.create({ titlePreface: "Hi there" }); // {titlePreface: "Hi there"},
+
+    console.log("win: " + win);
+    win.then(value => {
+	console.log("got it");
+    });
+
+/*
+    win.then(function(win) {
+       	console.log("calling processAllMatchingTabs");
+	processAllMatchingTabs((t) => { return t.url.match(rx) },
+			       (tabIds) => { console.log("Moving tabs to window "); return browser.tabs.move(tabIds, {windowId: win.id, index: -1} );  },
+			       currentWindowOnly);
+    },  function(e) { console.log("Failed to create window in moveMatchingTabsToNewWindow: " + e); } );
+*/
 }
 
 
 
+
+document.getElementById('test').addEventListener('click', ev => {
+    console.log("test");
+    let w = browser.windows.create({});
+    w.then( value => {
+        	       console.log("got it");
+                     },
+	    err => { console.log("error"); } );
+});
 
 
 
@@ -492,3 +512,40 @@ function closeLiteralOrPattern()
 }
 
 
+
+
+
+function showSortedTabs()
+{
+
+    let pr = browser.windows.getCurrent({populate: true});
+    pr.then ( (w) => {
+
+	var tmp = [];
+	w.tabs.forEach(function(t) {
+
+	    //	    console.log(t.title + " " + t.lastAccessed + " " + t.url);
+	    tmp.push({ time: t.lastAccessed, title: t.title, url: t.url});
+	    
+	});
+	tmp.sort((a, b) => a.time < b.time);
+	console.log("sorted " + tmp[0].title + " of " + tmp.length + " " + tmp[(tmp.length-1)].title);
+	let txt = "<html><body><table>";
+	tmp.forEach( t => txt += "<tr><td>" + t.title + "</td><td>" + new Date(t.time).toLocaleString() + "</td><td>" + t.url + "</td></tr>")
+	txt += "</table></body></html>";
+	console.log(txt);
+
+//	txt = "<tr><td>A</td><td>B</td></tr>";
+	let code = "document.getElementById('OldTabsTable').innerHTML  = '" + txt + "';"
+//	code = "document.getElementById('bob').innerHTML = 'thanks'";
+	var p = browser.tabs.create({active: true, url: "/oldTab.html"});
+	p.then( t => {
+	              browser.tabs.executeScript({ code:  code });
+	},
+	      (err) => {
+		  console.log("failed to get current window");
+	      });
+    })
+}
+
+document.getElementById('oldTabs').addEventListener('click', showSortedTabs);

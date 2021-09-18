@@ -8,13 +8,18 @@
 
 	<div>
 <h4>Global Actions</h4>	    
-	<center>
+<center>
+
+        <button type="button" id="test">Test</button>
+    
         <button type="button" id="mute">Mute All</button>
 	
         <button type="button" id="closeNewTabs">Close empty new tabs</button>	    	    	
 
         <button type="button" id="duplicates">De-duplicate</button>	
 
+        <button type="button" id="oldTabs">Old Tabs</button>	
+	
 	</center>
 </div>	
 
@@ -27,6 +32,7 @@
 URL pattern: <input type="textfield" id="findTabRX"/>
 <label for="tabURL">Common URLs</label>
 <select name="tabURL" id="tabURL">
+<option value="">Select</option>    
 <option value="https://mail.google.com">GMail</option>
 <option value="https://calendar.google.com/calendar/u/0/r/week">GCalendar</option>
 <option value="https://www.nytimes.com">NYT</option>
@@ -34,6 +40,7 @@ URL pattern: <input type="textfield" id="findTabRX"/>
 <option value="https://www.irishtimes.com">Irish Times</option>
 <option value="https://www.youtube.com">Youtube</option>
 <option value="https://www.bbc.com/sport">BBC sport</option>
+<option value="https://news.ycombinator.com">Hacker News</option>
 <option value="https://github.com">Github</option>
 <option value="https://oasis.ucdavis.edu">OASIS</option>
 <option value="https://grad.ucdavis.edu/programs">Grad programs</option>
@@ -55,17 +62,20 @@ Pattern: <input type="textfield" id="groupRX" />
 <p>
 	Close all tabs for
 	<select id="closeCommonTabs">
-	    <option value="ucdavis.zoom.us">Zoom</option>
-	    <option value="nytimes.com">NYyimes</option>
-	    <option value="washingtonpost.com">WashPost</option>
-	    <option value="stats.gradhub.ucdavis.edu">gradhub</option>	    
-	    <option value="oasis.ucdavis.edu">OASIS</option>
-	    <option value="youtube.com">YouTube</option>
-	    <option value="docs.google.com">Google Drive</option>
-	    <option value="about:newtab">Empty new tabs</option>
-	    <option value="ucdavis.app.box.com">Box (ucdavis)</option>
-	    <option value="llvm.org/doxygen">LLVM API pages</option>
+	    <option value="https://ucdavis.zoom.us">Zoom</option>
+	    <option value="https://nytimes.com">NYTimes</option>
+	    <option value="https://www.washingtonpost.com">WashPost</option>
+	    <option value="https://gradhub.ucdavis.edu">gradhub</option>	    
+	    <option value="https://oasis.ucdavis.edu">OASIS</option>
+	    <option value="https://www.youtube.com">YouTube</option>
+	    <option value="https://docs.google.com">Google Drive</option>
+	    <option value="https://about:newtab">Empty new tabs</option>
+	    <option value="https://ucdavis.app.box.com">Box (ucdavis)</option>
+	    <option value="https://llvm.org/doxygen">LLVM API pages</option>
 	</select>
+
+	<input type="checkbox" id="closePatternOrLiteral" checked="true">Literal (not pattern match)</input>
+	<p>
 
 Pattern: <input type="textfield" id="closeTabsRX" />
 </p>
