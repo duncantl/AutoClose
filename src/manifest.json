@@ -16,8 +16,11 @@
 	"homepage_url": "https://github.com/duncantl/AutoClose",
 
 	"permissions": [
-		"tabs",
-		"storage"
+	    "tabs",
+	    //	    "activeTab",
+	    "<all_urls>",
+	    "storage",
+	    "scripting"
 	],
 
 	"background": {
@@ -26,7 +29,7 @@
 	},
 
        "browser_action": {
-	   "default_icon": "images/triangle-small-4-01.png",
+	   "default_icon": "images/icons8-exit-sign-48.png",
 	   "default_popup": "popup.html",
 	   "default_title": "AutoClose"
        },
