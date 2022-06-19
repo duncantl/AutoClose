@@ -29,6 +29,13 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 
+chrome.runtime.onMessage.addListener(function(obj) {
+    console.log("got message: " + obj.id + " " + obj.windowId);
+    chrome.tabs.update(obj.id, {active: true});    
+    chrome.windows.update(obj.windowId, {focused: true});
+});
+
+
 
 /*			    
 Not relevant. This restricts the extension/popup to pages with a particular

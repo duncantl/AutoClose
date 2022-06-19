@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<meta charset="UTF-8">
@@ -18,7 +19,9 @@
 
         <button type="button" id="duplicates">De-duplicate</button>	
 
-        <button type="button" id="oldTabs">Old Tabs</button>	
+        <button type="button" id="oldTabs">Old Tabs (window)</button>
+
+        <button type="button" id="allOldTabs">Old Tabs (all windows)</button>		<!-- Implement allOldTabs -->
 	
 	</center>
 </div>	
@@ -69,7 +72,7 @@ Pattern: <input type="textfield" id="groupRX" />
 	    <option value="https://oasis.ucdavis.edu">OASIS</option>
 	    <option value="https://www.youtube.com">YouTube</option>
 	    <option value="https://docs.google.com">Google Drive</option>
-	    <option value="https://about:newtab">Empty new tabs</option>
+	    <option value="about:newtab">Empty new tabs</option>
 	    <option value="https://ucdavis.app.box.com">Box (ucdavis)</option>
 	    <option value="https://llvm.org/doxygen">LLVM API pages</option>
 	</select>
@@ -115,6 +118,16 @@ Pattern: <input type="textfield" id="closeTabsRX" />
 
 <center>
     <input type="checkbox" id="leaveOne">Leave One per URL group</input>
+</center>
+
+
+<hr width="50%">
+
+<center>
+    <div id="message">
+	<table id="oldTabsTable">
+	</table>
+    </div>
 </center>    
 
 

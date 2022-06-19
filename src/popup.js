@@ -435,7 +435,7 @@ function moveMatchingTabsToNewWindow(rx, currentWindowOnly)
 
 
 
-
+/* Works fine. Hijacking it for an experiment.
 document.getElementById('test').addEventListener('click', ev => {
     console.log("test");
     let w = browser.windows.create({});
@@ -444,6 +444,32 @@ document.getElementById('test').addEventListener('click', ev => {
                      },
 	    err => { console.log("error"); } );
 });
+*/
+
+// https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+document.getElementById('test').addEventListener('click', ev => {
+    console.log("test");
+    let p;
+    p = browser.tabs.create({active: true, url: "/oldTab.html"});
+    p.then( t => {
+	let a;
+	//	alert("this makes the script execute");
+	setTimeout(function() {
+    	    a = browser.scripting.executeScript({ target: {tabId:  t.id },
+						  func: showTabInfo,
+	   				          args: [ "[1, 2, 3]" ]
+//						  injectImmediately: true
+					    });
+	}, 125);
+
+//	a = browser.tabs.executeScript({ code: "document.body.innerHTML = 'Thanks';" });
+//	a.then(function() { alert("finished"); }, function() {alert("error!");});
+    });
+})
 
 
 
@@ -515,31 +541,49 @@ function closeLiteralOrPattern()
 
 
 
+// in the current window, not all windows.
 function showSortedTabs()
 {
-
     let pr = browser.windows.getCurrent({populate: true});
     pr.then ( (w) => {
 
 	var tmp = [];
 	w.tabs.forEach(function(t) {
 
-	    //	    console.log(t.title + " " + t.lastAccessed + " " + t.url);
-	    tmp.push({ time: t.lastAccessed, title: t.title, url: t.url});
+//    	    console.log("xxx: " + t.title + " " + t.lastAccessed + " " + t.url);
+	    tmp.push({ time: t.lastAccessed, title: "okay",  bob: browser.browserAction.getTitle({tabId: t.id}), //t.title
+		       url: t.url, index: t.index});
 	    
 	});
-	tmp.sort((a, b) => a.time < b.time);
+	tmp.sort((a, b) => a.time > b.time);
 	console.log("sorted " + tmp[0].title + " of " + tmp.length + " " + tmp[(tmp.length-1)].title);
-	let txt = "<html><body><table>";
-	tmp.forEach( t => txt += "<tr><td>" + t.title + "</td><td>" + new Date(t.time).toLocaleString() + "</td><td>" + t.url + "</td></tr>")
-	txt += "</table></body></html>";
-	console.log(txt);
+	let txt = "";
+	// browser.runtime.sendMessage({'tab': " + t.index + "})
+	//<a href='" + t.url + "'>"
 
+	//	href=\"javascript:browser.runtime.sendMessage({\"tab\": " + t.index + "})
+
+	/*
+	What we actually want.
+	tmp.forEach( t => txt += "<tr><td><a href='" + t.index + "'>" +
+         		         t.title + "</a></td><td>" +
+       		                  new Date(t.time).toLocaleString() + "</td><td><a href='" + t.url + "'>" +
+		     t.url.substring(0, 150)  +
+		     "</a></td></tr>");
+*/		     
+
+
+	tmp.forEach( t => txt += "<tr><td>" + t.index + "</td>" +
+         	     "<td>" + JSON.stringify(t) +  "</td><td>" +
+       		     new Date(t.time).toLocaleString() + "</td><td>" +  t.url + "</td></tr>");
+
+	
 //	txt = "<tr><td>A</td><td>B</td></tr>";
-	let code = "document.getElementById('OldTabsTable').innerHTML  = '" + txt + "';"
-//	code = "document.getElementById('bob').innerHTML = 'thanks'";
+	let code = "document.getElementById('OldTabsTable').innerHTML = '" + txt + "';";
+//	code =     "document.getElementById('OldTabsTable').innerHTML = '<tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr>'";
 	var p = browser.tabs.create({active: true, url: "/oldTab.html"});
 	p.then( t => {
+ //  	    alert("in showSortedTabs then " + t + " " + code);
 	              browser.tabs.executeScript({ code:  code });
 	},
 	      (err) => {
@@ -548,4 +592,158 @@ function showSortedTabs()
     })
 }
 
+
+function showAllSortedTabs0()
+{
+    let q = browser.tabs.query({});
+
+    q.then( (tabs) => {
+	// let txt = "";
+	let tmp = [];
+        for(let t of tabs) {
+	    tmp.push({ time: t.lastAccessed, title: t.title,
+		       url: t.url, index: t.index, id: t.id});	    
+	    // txt = txt + " " + t.title;
+	}
+
+	tmp.sort((a, b) => a.time > b.time);
+
+/*	
+	let txt = "";
+	tmp.forEach( t => txt += "<tr><td><a onclick='jumpTo(" + t.index + ")'>" +
+         		         t.title + "</a></td><td>" +
+       		                  new Date(t.time).toLocaleString() + "</td><td><a href='" + t.url + "'>" +
+		     t.url.substring(0, 150)  +
+		     "</a></td></tr>");
+*/		     
+
+
+	/*	
+	tmp.forEach( t => txt += "<tr><td>" + t.index + "</td><td>" +
+         		         t.title + "</td></tr>");
+*/
+
+//	txt = "<tr><td><a href=\"4\">hi</a></td><td>again</td></tr>";
+//	let code = "document.getElementById('OldTabsTable').innerHTML = '" + txt + "';";
+
+
+	let tbl = document.getElementById('oldTabsTable');
+
+	tmp.forEach( t => {
+	    let tr = document.createElement("tr");
+	    let td = document.createElement("td")
+	    let a = document.createElement("a");
+	    a.innerHTML = t.title.substring(0, 45);
+	    let id = t.id;
+	    a.setAttribute("tabId",  t.id);
+	    a.addEventListener('click', function(e) { alert("id = " + t.id); } );
+	    td.appendChild(a);
+	    tr.appendChild(td);
+	    tbl.appendChild(tr);
+	});
+
+	
+//	m.innerHTML = "<table border=1>" + txt + "</table>";
+/*	
+	var p = browser.tabs.create({active: true, url: "/oldTab.html"});
+
+//	let code = "showTabInfo('" + JSON.stringify(tmp) + "');"; // alert(\"finished\");";
+	let code = "document.showTabInfo('');"
+	p.then( t => {
+//	    console.log("tab id " + t.id);
+	    browser.scripting.executeScript({ target: {  tabId: t.id },
+					      func: showTabInfo,
+//					      args: [ "[1, 2, 3]" ],
+					      injectImmediately: true
+					    });
+	    // browser.tabs.executeScript({ code:  code });
+	   // t.document.getElementById('OldTabsTable').innerHTML = "hello";
+	   // alert("done: " + txt);
+	},
+	      (err) => {
+		  console.log("failed to get current window");
+	      });
+	// alert(txt);
+*/	
+    }, (err) => {
+        console.log("tabs.query() failed");
+       });
+}
+
+function showAllSortedTabs()
+{
+
+    let q = browser.tabs.query({});
+
+    q.then( (tabs) => {
+	let tmp = [];
+        for(let t of tabs) {
+	    tmp.push({ time: t.lastAccessed, title: t.title,
+		       url: t.url, index: t.index, id: t.id,
+		       windowId:  t.windowId});	    
+	}
+
+	tmp.sort((a, b) => a.time > b.time);
+    
+	var p = browser.tabs.create({active: true, url: "/oldTab.html"});
+
+	p.then( t => {
+	    setTimeout(function() {
+    		a = browser.scripting.executeScript({ target: {tabId:  t.id },
+						      func: showTabInfo,
+	   				              args: [ tmp ]
+						    });
+	    }, 125);
+	},
+		e => { alert("error loading oldTab.html") } );
+    });
+}
+
+
+function showTabInfo(obj)
+{
+    let tbl = document.getElementById('OldTabsTable');
+
+    obj.forEach( t => {
+	let tr = document.createElement("tr");
+	let td = document.createElement("td")
+	let a = document.createElement("a");
+	a.innerHTML = t.title.substring(0, 45);
+	let id = t.id;
+	a.setAttribute("tabId",  t.id);
+	a.addEventListener('click', function(e) {     // chrome.tabs.update(t.id, {active: true});
+	    //chrome.windows.update(tab.windowId, {focused: true});
+	    browser.runtime.sendMessage({id: t.id, windowId: t.windowId});
+						      console.log("id = " + t.id + " winId = " + t.windowId );
+						} );
+	td.appendChild(a);
+	tr.appendChild(td);
+
+
+	td = document.createElement("td")
+	td.innerHTML = new Date(t.time).toLocaleString();
+	tr.appendChild(td);
+
+	tbl.appendChild(tr);
+    });
+
+    
+}
+
+
+function jumpTo(id)
+{
+    alert(id);
+}
+
 document.getElementById('oldTabs').addEventListener('click', showSortedTabs);
+document.getElementById('allOldTabs').addEventListener('click', showAllSortedTabs);
+
+
+
+function handleOldTabClick(msg)
+{
+    console.log("handleOldTabClick " +  msg.tab);
+}
+
+browser.runtime.onMessage.addListener(handleOldTabClick);
