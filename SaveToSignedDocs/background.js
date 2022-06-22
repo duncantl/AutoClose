@@ -5,8 +5,14 @@ browser.contextMenus.create({
 });
 
 
-
 browser.contextMenus.onClicked.addListener(saveToSignedDocs);
+
+
+chrome.runtime.onMessage.addListener(function(obj) {
+
+    console.log("content disposition info: " + JSON.stringify(obj));
+    doDownload(obj.url, obj.contentDisposition);
+})
 
 
 function saveToSignedDocs(info, tab)
@@ -15,19 +21,19 @@ function saveToSignedDocs(info, tab)
     console.log("Saving " + info.linkUrl + " to ~/OGS/SignedDocs/  and opening with Adobe Acrobat " + typeof(url));
     let u = new URL(info.linkUrl);
     let rx = new RegExp("\\.pdf$");
-    let ext = "";
-    if(!rx.test(u.pathname))
-	ext += ".pdf";
-
 
     getContentDispositionLocal(info.linkUrl, tab);
-    
+}
 
+
+function doDownload(url, disposition)
+{
+    console.log("doDownload " + url + " disposition: " + disposition);
     
-    browser.downloads.download({ url: info.linkUrl, filename: "SignedDocs/" + basename(u.pathname) + ext })
+    browser.downloads.download({ url: url, filename: "SignedDocs/" + extractFilename(disposition)})
 	.then( id => {
 	    console.log("id " + id + " " + typeof(id));
-	    return(browser.downloads.search({id: id})); // new browser.downloads.DownloadQuery
+	    return(browser.downloads.search({id: id})); 
 	})
 	.then(dl => {
 	    // going to get the MIME type, etc. and do something before opening.
@@ -35,8 +41,21 @@ function saveToSignedDocs(info, tab)
 	    browser.downloads.show(dl[0].id);
 //	    let port = browser.runtime.connectNative("/Applications/Adobe Acrobat DC/Adobe Acrobat.app");
 //	    port.postMessage("open " + dl.filename);
-	}); 
+	});
 }
+
+// https://stackoverflow.com/questions/40939380/how-to-get-file-name-from-content-disposition
+function extractFilename(disposition)
+{
+    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+    const matches = filenameRegex.exec(disposition);
+    let filename = "no_disposition";
+    if (matches != null && matches[1]) { 
+          filename = matches[1].replace(/['"]/g, '');
+    }
+    return(filename);
+}
+
 
 
 // https://stackoverflow.com/questions/3820381/need-a-basename-function-in-javascript
@@ -65,8 +84,10 @@ function handleKeyCommand(info, tab)
 function getContentDispositionLocal(url, tab)
 {
     console.log("getContentDispositionLocal() " + tab);
-    browser.scripting.executeScript({target: {tabId: tab.id}, func: getContentDisposition, args: [ url ]})
+    let p = browser.scripting.executeScript({target: {tabId: tab.id}, func: getContentDisposition, args: [ url ]})
 	.then(() => console.log("sent getContentDisposition call"));
+
+    return(p);
 }
 
 
