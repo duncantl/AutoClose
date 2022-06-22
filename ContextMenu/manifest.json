@@ -1,0 +1,35 @@
+{
+	"manifest_version": 2,
+
+	"name": "ContextMenu",
+	"description": "add to the context menu and keybindings to send tabs to groups of windows",
+	"version": "0.1.0",
+
+	"homepage_url": "https://github.com/duncantl/ContextMenu",
+
+	"permissions": [
+	    "contextMenus",
+	    "tabs"
+	],
+
+
+       "background": { 
+           "scripts": ["background.js"],
+	   "persistent": true
+       },
+
+
+       "commands": {
+	   "news": {
+	       "suggested_key": {
+		   "default": "Alt+Shift+N" 
+	       },
+	       "description": "Send tab to news window"
+	   },
+	   "gradstudies": {
+	       "suggested_key": {
+		   "default": "Alt+Shift+G"
+	       }
+	   }
+       }
+}
