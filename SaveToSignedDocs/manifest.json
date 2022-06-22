@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+
+	"name": "SaveToSignedDocs",
+	"description": "add to the context menu and keybindings to send tabs to groups of windows",
+	"version": "0.1.0",
+
+	"homepage_url": "https://github.com/duncantl/SaveToSignedDocs",
+
+	"permissions": [
+	    "contextMenus",
+	    "tabs",
+	    "downloads",
+	    "downloads.open",
+	    "nativeMessaging"
+	],
+
+
+       "background": { 
+           "scripts": ["background.js"],
+	   "persistent": true
+       }
+
+//,       "icon": 
+
+}
