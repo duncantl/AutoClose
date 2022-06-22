@@ -12,14 +12,32 @@
 	    "tabs",
 	    "downloads",
 	    "downloads.open",
-	    "nativeMessaging"
+	    "nativeMessaging",
+	    "<all_urls>", // for content-disposition as is scripting.
+//	    "activeTab", 
+	    "scripting"  
 	],
+
+       "content_scripts": [
+           {  "matches": [ "https://mail.google.com/mail/" ],
+	      "js": ["head.js"] 
+	   }
+       ],
 
 
        "background": { 
-           "scripts": ["background.js"],
+           "scripts": ["head.js", "background.js"],
 	   "persistent": true
-       }
+       },
+
+      "commands": {
+	  "mostRecent": {
+	      "suggested_key": {
+		  "default": "MacCtrl+D"
+	      }
+	  }
+      }
+
 
 //,       "icon": 
 

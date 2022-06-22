@@ -18,6 +18,11 @@ function saveToSignedDocs(info, tab)
     let ext = "";
     if(!rx.test(u.pathname))
 	ext += ".pdf";
+
+
+    getContentDispositionLocal(info.linkUrl, tab);
+    
+
     
     browser.downloads.download({ url: info.linkUrl, filename: "SignedDocs/" + basename(u.pathname) + ext })
 	.then( id => {
@@ -43,3 +48,26 @@ function basename(str)
         base = base.substring(0, base.lastIndexOf("."));
    return base;
 }
+
+
+
+function handleKeyCommand(info, tab)
+{
+    browser.downloads.search( { limit: 1, orderBy: ["-startTime"] })
+	.then(d => {
+	    console.log("last download " +  JSON.stringify(d) + " tab: " + JSON.stringify(tab));
+	    getContentDispositionLocal(d[0].url, tab)
+	});
+
+}
+
+
+function getContentDispositionLocal(url, tab)
+{
+    console.log("getContentDispositionLocal() " + tab);
+    browser.scripting.executeScript({target: {tabId: tab.id}, func: getContentDisposition, args: [ url ]})
+	.then(() => console.log("sent getContentDisposition call"));
+}
+
+
+browser.commands.onCommand.addListener(handleKeyCommand);
