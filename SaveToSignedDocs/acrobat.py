@@ -30,12 +30,9 @@ try:
         sys.stdout.buffer.flush()
 
     while True:
-        receivedMessage = getMessage()
-        sz = os.path.getsize(receivedMessage);
-        os.system("open -a 'adobe acrobat' \"" + receivedMessage + "\"")                
-        f = open("/tmp/adobe", "a")
-        f.write("opening \"" + receivedMessage + "\"   " + str(sz) + "\n")
-        f.close()
+        filename = getMessage()
+        sz = os.path.getsize(filename);
+        os.system("open -a 'adobe acrobat' \"" + filename + "\"")                
         # sendMessage("opened " + receivedMessage)
 
 except AttributeError:
