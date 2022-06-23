@@ -47,38 +47,42 @@ function saveToSignedDocs(info, tab)
 function doDownload(url, disposition)
 {
     console.log("doDownload " + url + " disposition: " + disposition);
-    
-    browser.downloads.download({ url: url, filename: "SignedDocs/" + extractFilename(disposition)})
+
+    // There is a race condition.  The download may still be progressing when we resolve the promise
+    // and can get the file name.
+    // So we list for (all) download events and process only those for this download id
+    // When we get an event that indicates the download is complete, then we call showPDF().
+    let dl = browser.downloads.download({ url: url, filename: "SignedDocs/" + extractFilename(disposition)})
 	.then( id => {
-	    // not sure why we are doing this. We already  have the id and the filename
-	    // but need the full patht the file name without asssuming.
-	    console.log("id " + id + " " + typeof(id));
-	    return(browser.downloads.search({id: id})); 
-	})
-	.then(dl => {
-	    // going to get the MIME type, etc. and do something before opening.
-	    console.log("download item: " + JSON.stringify(dl));
+	    //XXX need to remove the listener when the download is complete.
+	    let h = function(delta) {
+		if(delta.id != id)
+		    return(false);
+
+		if(delta.state.current != "complete")
+		    return(false);
+		
+		// not sure why we are doing this. We already  have the id and the filename
+		// but need the full patht the file name without asssuming.
+		console.log("id " + id + " " + typeof(id) + " download complete to " + delta.filename);
+//		showPDF(delta.filename)
+
+		browser.downloads.search({id: id})
+		    .then(dl => {
+			// going to get the MIME type, etc. and do something before opening.
+			console.log("download item: " + JSON.stringify(dl));
 
 	    //	    browser.downloads.show(dl[0].id);
-	    showPDF(dl[0].filename)
+			showPDF(dl[0].filename)
+			browser.downloads.onChanged.removeListener(h)
+		    })
 
+	    }
 	    
-/*	    
-	    dl[0].mime="application/duncan";
-	    browser.downloads.open(dl[0].id);	    
-*/
-/*	    
-	    browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
-		.then(tabs => browser.tabs.get(tabs[0].id))
-		.then(t => {
-		    console.log("calling openDownload() " + dl[0].id + " " + dl[0].filename );
-		    browser.scripting.executeScript({target: {tabId: t.id} , func: openDownload, args: [dl[0].id]})
-		});
+	    browser.downloads.onChanged.addListener(h)
+	})
 
-//	    let port = browser.runtime.connectNative("/Applications/Adobe Acrobat DC/Adobe Acrobat.app");
-//	    port.postMessage("open " + dl.filename);
-*/
-	});
+
 }
 
 // https://stackoverflow.com/questions/40939380/how-to-get-file-name-from-content-disposition

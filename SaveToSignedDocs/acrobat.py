@@ -31,7 +31,11 @@ try:
 
     while True:
         receivedMessage = getMessage()
-        os.system("open -a 'adobe acrobat' \"" + receivedMessage + "\"")
+        sz = os.path.getsize(receivedMessage);
+        os.system("open -a 'adobe acrobat' \"" + receivedMessage + "\"")                
+        f = open("/tmp/adobe", "a")
+        f.write("opening \"" + receivedMessage + "\"   " + str(sz) + "\n")
+        f.close()
         # sendMessage("opened " + receivedMessage)
 
 except AttributeError:
