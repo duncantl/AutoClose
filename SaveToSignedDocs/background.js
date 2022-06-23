@@ -5,13 +5,32 @@ browser.contextMenus.create({
 });
 
 
-browser.contextMenus.onClicked.addListener(saveToSignedDocs);
+browser.contextMenus.onClicked.addListener(saveToSignedDocs);//XXX change back to saveToSignedDocs
+
+// checking what ?
+function saveToSignedDocs2(info, tab)
+{
+    console.log("info " + JSON.stringify(info));
+    console.log("Saving " + info.linkUrl + " to ~/OGS/SignedDocs/ and opening");
+
+    browser.downloads.download({ url: info.linkUrl, filename: "SignedDocs/" + "bob.pdf"})
+	.then( id => {
+	    console.log("opening download item: " + id);
+	    browser.permissions.request({origins: ["https://mail.google.com/*"]})
+		.then(	    browser.downloads.open(id) );
+	});    
+
+}
+
+
 
 
 chrome.runtime.onMessage.addListener(function(obj) {
 
-    console.log("content disposition info: " + JSON.stringify(obj));
-    doDownload(obj.url, obj.contentDisposition);
+    if(obj.action && obj.action == "content-disposition") {
+	console.log("content disposition info: " + JSON.stringify(obj));
+	doDownload(obj.url, obj.contentDisposition);
+    }
 })
 
 
@@ -38,8 +57,14 @@ function doDownload(url, disposition)
 	    // going to get the MIME type, etc. and do something before opening.
 	    console.log("download item: " + JSON.stringify(dl));
 
+
+	    browser.downloads.show(dl[0].id);
+
+/*	    
 	    dl[0].mime="application/duncan";
-	    browser.downloads.open(dl[0].id);
+	    browser.downloads.open(dl[0].id);	    
+*/
+/*	    
 	    browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
 		.then(tabs => browser.tabs.get(tabs[0].id))
 		.then(t => {
@@ -49,6 +74,7 @@ function doDownload(url, disposition)
 
 //	    let port = browser.runtime.connectNative("/Applications/Adobe Acrobat DC/Adobe Acrobat.app");
 //	    port.postMessage("open " + dl.filename);
+*/
 	});
 }
 
@@ -85,25 +111,33 @@ function handleKeyCommand(info, tab)
 	browser.downloads.search( { limit: 1, orderBy: ["-startTime"] })
 	    .then(d => {
 		console.log("last download " +  JSON.stringify(d) + " tab: " + JSON.stringify(tab));
-		getContentDispositionLocal(d[0].url, tab)
+		showPDF(d[0].filename);
 	    });
 	break;
+			// getContentDispositionLocal(d[0].url, tab)
+
+        
     case "fetchPDF":
     case "fetchPDF2":
 	let which = info == "fetchPDF" ? 0 : 1;
-	browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
-	    .then(tabs => browser.tabs.get(tabs[0].id))
-            .then( t => { console.log("about to call findPDF() in content-script  which =" + which);
-			  browser.scripting.executeScript({target: {tabId: t.id} , func: findPDF, args: [which]})
-			});
+	console.log("handling fetch key " + command);
+	// is tab already available here?
+	let p = browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
+      	      .then(tabs => browser.tabs.get(tabs[0].id))
+	    .then( tab => {
+		console.log("about to call findPDF() in content-script  which =" + which);
+		browser.scripting.executeScript({target: {tabId: tab.id} , func: findPDF, args: [which]});
+	    })
 	break;
     }
+
+    console.log("finished handleKeyCommand " + info);
 }
 
 
 function getContentDispositionLocal(url, tab)
 {
-    console.log("getContentDispositionLocal() " + tab);
+    console.log("getContentDispositionLocal() " + JSON.stringify(tab));
     let p = browser.scripting.executeScript({target: {tabId: tab.id}, func: getContentDisposition, args: [ url ]})
 	.then(() => console.log("sent getContentDisposition call"));
 
@@ -112,3 +146,15 @@ function getContentDispositionLocal(url, tab)
 
 
 browser.commands.onCommand.addListener(handleKeyCommand);
+
+
+var port;
+
+function showPDF(filename)
+{
+    if(!port || port === undefined)
+	port = browser.runtime.connectNative("acrobat");
+
+    port.postMessage(filename); // not asynchronous
+    console.log("sent message to acrobat launcher: " + filename);
+}

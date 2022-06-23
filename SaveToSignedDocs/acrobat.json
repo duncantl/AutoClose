@@ -1,0 +1,7 @@
+{
+  "name": "acrobat",
+  "description": "launch acrobat",
+  "path": "/Users/duncan/Projects/FirefoxExtensions/AutoClose/SaveToSignedDocs/acrobat.py",
+  "type": "stdio",
+  "allowed_extensions": [ "savetosigndocs@github.com" ]
+}
