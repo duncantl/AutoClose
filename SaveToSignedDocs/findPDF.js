@@ -1,3 +1,6 @@
+/*
+  Find a pdf attachment in the gmail tab
+*/
 function findPDF(which)
 {
     console.log("in findPDF() in content script");
@@ -18,7 +21,7 @@ function findPDF(which)
 }
 
 
-
+// won't work as not part of a user input action.
 function openDownload(id)
 {
     console.log("openDownload in content-script: " + id);
