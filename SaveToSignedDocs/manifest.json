@@ -26,7 +26,7 @@
 
 
        "background": { 
-           "scripts": ["head.js", "background.js"],
+           "scripts": ["head.js", "background.js", "findPDF.js"],
 	   "persistent": true
        },
 
@@ -35,8 +35,19 @@
 	      "suggested_key": {
 		  "default": "MacCtrl+D"
 	      }
-	  }
+	  },
+	  "fetchPDF": {
+	      "suggested_key": {
+		  "default": "MacCtrl+F"
+	      }
+	  },
+	  "fetchPDF2": {
+	      "suggested_key": {
+		  "default": "MacCtrl+Alt+F"
+	      }
+	  }	  	  
       }
+
 
 
 //,       "icon": 

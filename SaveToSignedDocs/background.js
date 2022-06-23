@@ -20,7 +20,6 @@ function saveToSignedDocs(info, tab)
     console.log("info " + JSON.stringify(info));
     console.log("Saving " + info.linkUrl + " to ~/OGS/SignedDocs/  and opening with Adobe Acrobat " + typeof(url));
     let u = new URL(info.linkUrl);
-    let rx = new RegExp("\\.pdf$");
 
     getContentDispositionLocal(info.linkUrl, tab);
 }
@@ -38,7 +37,16 @@ function doDownload(url, disposition)
 	.then(dl => {
 	    // going to get the MIME type, etc. and do something before opening.
 	    console.log("download item: " + JSON.stringify(dl));
-	    browser.downloads.show(dl[0].id);
+
+	    dl[0].mime="application/duncan";
+	    browser.downloads.open(dl[0].id);
+	    browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
+		.then(tabs => browser.tabs.get(tabs[0].id))
+		.then(t => {
+		    console.log("calling openDownload() " + dl[0].id + " " + dl[0].filename );
+		    browser.scripting.executeScript({target: {tabId: t.id} , func: openDownload, args: [dl[0].id]})
+		});
+
 //	    let port = browser.runtime.connectNative("/Applications/Adobe Acrobat DC/Adobe Acrobat.app");
 //	    port.postMessage("open " + dl.filename);
 	});
@@ -72,12 +80,24 @@ function basename(str)
 
 function handleKeyCommand(info, tab)
 {
-    browser.downloads.search( { limit: 1, orderBy: ["-startTime"] })
-	.then(d => {
-	    console.log("last download " +  JSON.stringify(d) + " tab: " + JSON.stringify(tab));
-	    getContentDispositionLocal(d[0].url, tab)
-	});
-
+    switch(info) {
+    case "mostRecent":
+	browser.downloads.search( { limit: 1, orderBy: ["-startTime"] })
+	    .then(d => {
+		console.log("last download " +  JSON.stringify(d) + " tab: " + JSON.stringify(tab));
+		getContentDispositionLocal(d[0].url, tab)
+	    });
+	break;
+    case "fetchPDF":
+    case "fetchPDF2":
+	let which = info == "fetchPDF" ? 0 : 1;
+	browser.tabs.query({active: true, windowId: browser.windows.WINDOW_ID_CURRENT})
+	    .then(tabs => browser.tabs.get(tabs[0].id))
+            .then( t => { console.log("about to call findPDF() in content-script  which =" + which);
+			  browser.scripting.executeScript({target: {tabId: t.id} , func: findPDF, args: [which]})
+			});
+	break;
+    }
 }
 
 
