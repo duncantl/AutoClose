@@ -50,6 +50,8 @@ function doDownload(url, disposition)
     
     browser.downloads.download({ url: url, filename: "SignedDocs/" + extractFilename(disposition)})
 	.then( id => {
+	    // not sure why we are doing this. We already  have the id and the filename
+	    // but need the full patht the file name without asssuming.
 	    console.log("id " + id + " " + typeof(id));
 	    return(browser.downloads.search({id: id})); 
 	})
@@ -57,9 +59,10 @@ function doDownload(url, disposition)
 	    // going to get the MIME type, etc. and do something before opening.
 	    console.log("download item: " + JSON.stringify(dl));
 
+	    //	    browser.downloads.show(dl[0].id);
+	    showPDF(dl[0].filename)
 
-	    browser.downloads.show(dl[0].id);
-
+	    
 /*	    
 	    dl[0].mime="application/duncan";
 	    browser.downloads.open(dl[0].id);	    
