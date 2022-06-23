@@ -3,7 +3,8 @@
 import sys
 import json
 import struct
-import os
+#import os
+import subprocess
 
 try:
     # Python 3.x version
@@ -31,8 +32,9 @@ try:
 
     while True:
         filename = getMessage()
-        sz = os.path.getsize(filename);
-        os.system("open -a 'adobe acrobat' \"" + filename + "\"")                
+        subprocess.run(["open", "-a", "adobe acrobat", filename])
+        #sz = os.path.getsize(filename);
+        # os.system("open -a 'adobe acrobat' \"" + filename + "\"")                
         # sendMessage("opened " + receivedMessage)
 
 except AttributeError:
