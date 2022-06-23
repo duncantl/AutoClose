@@ -48,8 +48,12 @@
 	  }	  	  
       }
 
+      ,
 
-
-//,       "icon": 
+       "browser_specific_settings": {
+	   "gecko": {
+	       "id": "savetosigndocs@github.com"
+	   }
+       }
 
 }
