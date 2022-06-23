@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 
-	"name": "ContextMenu",
+	"name": "Move tab to window",
 	"description": "add to the context menu and keybindings to send tabs to groups of windows",
 	"version": "0.1.0",
 
@@ -9,7 +9,11 @@
 
 	"permissions": [
 	    "contextMenus",
-	    "tabs"
+	    "tabs",
+	    "downloads",
+	    "downloads.open",
+	    "nativeMessaging",
+	    "clipboardWrite"
 	],
 
 
@@ -30,6 +34,6 @@
 	       "suggested_key": {
 		   "default": "Alt+Shift+G"
 	       }
-	   }
+	   }	   
        }
 }
