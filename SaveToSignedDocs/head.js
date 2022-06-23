@@ -15,4 +15,4 @@ function getContentDisposition(url)
 }
 
 
-console.log("head.js script running in Web page");
+// console.log("head.js script running in Web page");
